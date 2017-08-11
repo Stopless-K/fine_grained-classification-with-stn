@@ -83,10 +83,10 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
   booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
   year={2017}
 }
-@inproceedings{huang2017densely,
-  title={Densely connected convolutional networks},
-  author={Huang, Gao and Liu, Zhuang and van der Maaten, Laurens and Weinberger, Kilian Q },
-  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
-  year={2017}
+@inproceedings{he2016identity,
+  title={Identity mappings in deep residual networks},
+  author={He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  booktitle={European Conference on Computer Vision},
+  year={2016}
 }
 ```
