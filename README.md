@@ -58,10 +58,6 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
 |  56   |      *      |     *      |    0.85M   |                  |                   |   Pre-Act    |
 | 110   |      *      |     *      |    1.7M    |                  |                   |   Pre-Act    |
 
-| depth |  growthRate | reduction  | parameters |  error   cifar10 |   error  cifar100 | architecture |
-|:-----:|:-----------:|:----------:|:----------:|:----------------:|:-----------------:|:------------:|
-|  100  |     12      |    0.5     |            |                  |                   |   Pre-Act    |
-
 ## Other frameworks
 * [torch (@facebookresearch)](https://github.com/facebookresearch/ResNeXt). (Original) Cifar and Imagenet
 * [MXNet (@dmlc)](https://github.com/dmlc/mxnet/tree/master/example/image-classification#imagenet-1k). Imagenet
