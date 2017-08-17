@@ -7,7 +7,7 @@
 - [x] Train on Cifar10 and Cifar100 with ResNet20,32,44,56,110
 - [x] Train on Cifar10 and Cifar100 with Pre-Activation ResNet20,32,44,56,110
 - [x] Train on Cifar10 and Cifar100 with DenseNet
-- [ ] Train Imagenet
+- [x] Train Imagenet
 
 ## Usage
 To train on Cifar-10 using 4 gpu:
@@ -55,8 +55,6 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
 |  20   |      *      |     *      |    0.27M   |       8.35       |       31.79       |   Pre-Act    |
 |  32   |      *      |     *      |    0.46M   |       7.57       |       30.02       |   Pre-Act    |
 |  44   |      *      |     *      |    0.66M   |                  |       29.43       |   Pre-Act    |
-|  56   |      *      |     *      |    0.85M   |                  |                   |   Pre-Act    |
-| 110   |      *      |     *      |    1.7M    |                  |                   |   Pre-Act    |
 
 ## Other frameworks
 * [torch (@facebookresearch)](https://github.com/facebookresearch/ResNeXt). (Original) Cifar and Imagenet
@@ -71,6 +69,12 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
   booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
   year={2016}
 }
+@inproceedings{he2016identity,
+  title={Identity mappings in deep residual networks},
+  author={He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
+  booktitle={European Conference on Computer Vision},
+  year={2016}
+}
 @inproceedings{xie2017aggregated,
   title={Aggregated residual transformations for deep neural networks},
   author={Xie, Saining and Girshick, Ross and Doll{\'a}r, Piotr and Tu, Zhuowen and He, Kaiming},
@@ -82,11 +86,5 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
   author={Huang, Gao and Liu, Zhuang and Weinberger, Kilian Q and van der Maaten, Laurens},
   booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
   year={2017}
-}
-@inproceedings{he2016identity,
-  title={Identity mappings in deep residual networks},
-  author={He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
-  booktitle={European Conference on Computer Vision},
-  year={2016}
 }
 ```

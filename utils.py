@@ -94,6 +94,7 @@ class RecorderMeter(object):
     if save_path is not None:
       fig.savefig(save_path, dpi=dpi, bbox_inches='tight')
       print ('---- save figure {} into {}'.format(title, save_path))
+    plt.close(fig)
     
 
 def time_string():
@@ -106,3 +107,8 @@ def convert_secs2time(epoch_time):
   need_mins = int((epoch_time - 3600*need_hour) / 60)
   need_secs = int(epoch_time - 3600*need_hour - 60*need_mins)
   return need_hour, need_mins, need_secs
+
+def time_file_str():
+  ISOTIMEFORMAT='%Y-%m-%d'
+  string = '{}'.format(time.strftime( ISOTIMEFORMAT, time.gmtime(time.time()) ))
+  return string + '-{}'.format(random.randint(1, 10000))
