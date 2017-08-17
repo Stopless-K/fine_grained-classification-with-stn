@@ -18,3 +18,5 @@ from .resnet import resnet20, resnet32, resnet44, resnet56, resnet110
 from .preresnet import preresnet20, preresnet32, preresnet44, preresnet56, preresnet110
 from .caffe_cifar import caffe_cifar
 from .densenet import densenet100_12
+
+from .imagenet_resnet import resnet18, resnet34, resnet50, resnet101, resnet152

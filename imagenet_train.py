@@ -52,7 +52,7 @@ def main():
 
     # create model
     print_log("=> creating model '{}'".format(args.arch), log)
-    model = models.__dict__[args.arch]()
+    model = models.__dict__[args.arch](1000)
     print_log("=> Model : {}".format(model), log)
     print_log("=> parameter : {}".format(args), log)
 
