@@ -138,7 +138,7 @@ def main():
     print_log("=> do not use any checkpoint for {} model".format(args.arch), log)
 
   if args.evaluate:
-    validate(val_loader, net, criterion)
+    validate(test_loader, net, criterion, log)
     return
 
   # Main loop
@@ -226,6 +226,7 @@ def train(train_loader, model, criterion, optimizer, epoch, log):
             'Prec@5 {top5.val:.3f} ({top5.avg:.3f})   '.format(
             epoch, i, len(train_loader), batch_time=batch_time,
             data_time=data_time, loss=losses, top1=top1, top5=top5) + time_string(), log)
+  print_log('  **Train** Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f} Error@1 {error1:.3f}'.format(top1=top1, top5=top5, error1=100-top1.avg), log)
   return top1.avg, losses.avg
 
 def validate(val_loader, model, criterion, log):
