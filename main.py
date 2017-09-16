@@ -122,6 +122,7 @@ def main():
     net.cuda()
     criterion.cuda()
 
+  recorder = RecorderMeter(args.epochs)
   # optionally resume from a checkpoint
   if args.resume:
     if os.path.isfile(args.resume):
@@ -142,8 +143,6 @@ def main():
     return
 
   # Main loop
-  recorder = RecorderMeter(args.epochs)
-
   start_time = time.time()
   epoch_time = AverageMeter()
   for epoch in range(args.start_epoch, args.epochs):
