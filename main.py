@@ -1,6 +1,6 @@
 from __future__ import division
 
-import os, sys, shutil, time, random
+import os, sys, pdb, shutil, time, random
 import argparse
 import torch
 import torch.backends.cudnn as cudnn
@@ -158,6 +158,7 @@ def main():
     train_acc, train_los = train(train_loader, net, criterion, optimizer, epoch, log)
 
     # evaluate on validation set
+    #val_acc,   val_los   = extract_features(test_loader, net, criterion, log)
     val_acc,   val_los   = validate(test_loader, net, criterion, log)
     is_best = recorder.update(epoch, train_los, train_acc, val_los, val_acc)
 
@@ -245,6 +246,38 @@ def validate(val_loader, model, criterion, log):
 
     # compute output
     output = model(input_var)
+    loss = criterion(output, target_var)
+
+    # measure accuracy and record loss
+    prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
+    losses.update(loss.data[0], input.size(0))
+    top1.update(prec1[0], input.size(0))
+    top5.update(prec5[0], input.size(0))
+
+  print_log('  **Test** Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f} Error@1 {error1:.3f}'.format(top1=top1, top5=top5, error1=100-top1.avg), log)
+
+  return top1.avg, losses.avg
+
+def extract_features(val_loader, model, criterion, log):
+  losses = AverageMeter()
+  top1 = AverageMeter()
+  top5 = AverageMeter()
+
+  # switch to evaluate mode
+  model.eval()
+
+  for i, (input, target) in enumerate(val_loader):
+    if args.use_cuda:
+      target = target.cuda(async=True)
+      input = input.cuda()
+    input_var = torch.autograd.Variable(input, volatile=True)
+    target_var = torch.autograd.Variable(target, volatile=True)
+
+    # compute output
+    output, features = model([input_var])
+
+    pdb.set_trace()
+
     loss = criterion(output, target_var)
 
     # measure accuracy and record loss
