@@ -1,6 +1,7 @@
 # ResNeXt & ResNet Pytorch Implementation
-- ResNeXt (Aggregated Residual Transformations for Deep Neural Networks)
 - ResNet (Deep Residual Learning for Image Recognition)
+- Pre-act ResNet (Identity mappings in deep residual networks)
+- ResNeXt (Aggregated Residual Transformations for Deep Neural Networks)
 - DenseNet (Densely Connected Convolutional Networks)
 
 - [x] Train on Cifar10 and Cifar100 with ResNeXt29-8-64d and ResNeXt29-16-64d
@@ -66,7 +67,7 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
 @inproceedings{he2016deep,
   title={Deep residual learning for image recognition},
   author={He, Kaiming and Zhang, Xiangyu and Ren, Shaoqing and Sun, Jian},
-  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  booktitle={Computer Vision and Pattern Recognition},
   year={2016}
 }
 @inproceedings{he2016identity,
@@ -78,13 +79,13 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
 @inproceedings{xie2017aggregated,
   title={Aggregated residual transformations for deep neural networks},
   author={Xie, Saining and Girshick, Ross and Doll{\'a}r, Piotr and Tu, Zhuowen and He, Kaiming},
-  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  booktitle={Computer Vision and Pattern Recognition},
   year={2017}
 }
 @inproceedings{huang2017densely,
   title={Densely connected convolutional networks},
   author={Huang, Gao and Liu, Zhuang and Weinberger, Kilian Q and van der Maaten, Laurens},
-  booktitle={Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition},
+  booktitle={Computer Vision and Pattern Recognition},
   year={2017}
 }
 ```
