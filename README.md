@@ -8,7 +8,7 @@
 - [x] Train on Cifar10 and Cifar100 with ResNet20,32,44,56,110
 - [x] Train on Cifar10 and Cifar100 with Pre-Activation ResNet20,32,44,56,110
 - [x] Train on Cifar10 and Cifar100 with DenseNet
-- [x] Train Imagenet
+- [x] Train ImageNet
 
 ## Usage
 To train on Cifar-10 using 4 gpu:
