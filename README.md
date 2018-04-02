@@ -57,6 +57,16 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
 |  32   |      *      |     *      |    0.46M   |       7.57       |       30.02       |   Pre-Act    |
 |  44   |      *      |     *      |    0.66M   |                  |       29.43       |   Pre-Act    |
 
+#### ImageNet-1k (CenterCrop)
+|    arch    | Top-1 Accuracy | Top-5 Accuracy |  Loss  |
+|:----------:|:--------------:|:--------------:|:------:|
+| ResNet-18  |      70.17     |     89.48      | 1.3097 |
+| ResNet-18  |      70.22     |     89.43      | 1.5979 |
+| ResNet-18  |      70.28     |     89.63      | 1.3023 |
+| ResNet-34  |      73.92     |     91.62      | 1.0315 |
+| ResNet-50  |      76.19     |     93.10      | 0.8172 |
+
+
 ## Other frameworks
 * [torch (@facebookresearch)](https://github.com/facebookresearch/ResNeXt). (Original) Cifar and Imagenet
 * [MXNet (@dmlc)](https://github.com/dmlc/mxnet/tree/master/example/image-classification#imagenet-1k). Imagenet
