@@ -4,14 +4,14 @@
 - ResNeXt (Aggregated Residual Transformations for Deep Neural Networks)
 - DenseNet (Densely Connected Convolutional Networks)
 
-- [x] Train on Cifar10 and Cifar100 with ResNeXt29-8-64d and ResNeXt29-16-64d
-- [x] Train on Cifar10 and Cifar100 with ResNet20,32,44,56,110
-- [x] Train on Cifar10 and Cifar100 with Pre-Activation ResNet20,32,44,56,110
-- [x] Train on Cifar10 and Cifar100 with DenseNet
+- [x] Train on CIFAR-10 and CIFAR-100 with ResNeXt29-8-64d and ResNeXt29-16-64d
+- [x] Train on CIFAR-10 and CIFAR-100 with ResNet20,32,44,56,110
+- [x] Train on CIFAR-10 and CIFAR-100 with Pre-Activation ResNet20,32,44,56,110
+- [x] Train on CIFAR-10 and CIFAR-100 with DenseNet
 - [x] Train ImageNet
 
 ## Usage
-To train on Cifar-10 using 4 gpu:
+To train on CIFAR-10 using 4 gpu:
 
 ```bash
 python main.py ./data/cifar.python --dataset cifar10 --arch resnext29_8_64 --save_path ./snapshots/cifar10_resnext29_8_64_300 --epochs 300 --learning_rate 0.05 --schedule 150 225 --gammas 0.1 0.1 --batch_size 128 --workers 4 --ngpu 4
@@ -20,13 +20,13 @@ python main.py ./data/cifar.python --dataset cifar10 --arch resnext29_8_64 --sav
 Or there are some off-the-shelf scripts can dirrectly be used for training.
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1,2,3 sh ./shells/train_model.sh resnet20 cifar10
+CUDA_VISIBLE_DEVICES=0,1,2,3 sh ./scripts/train_model.sh resnet20 cifar10
 ```
 
 And a simplified caffenet-like model for cifar10, obtaining 89.5 top1 accuracy.
 
 ```
-sh ./shells/cifar10_caffe.sh
+sh ./scripts/cifar10_caffe.sh
 ```
 
 ## Configurations
