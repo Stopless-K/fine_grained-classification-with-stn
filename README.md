@@ -23,7 +23,12 @@ Or there are some off-the-shelf scripts can dirrectly be used for training.
 CUDA_VISIBLE_DEVICES=0,1,2,3 sh ./scripts/train_model.sh resnet20 cifar10
 ```
 
-And a simplified caffenet-like model for cifar10, obtaining 89.5 top1 accuracy.
+Train the ResNet-18 on ImageNet with 8 GPUs
+```bash
+CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 sh ./scripts/train_imagenet.sh resnet18
+```
+
+A simplified CaffeNet-like model for CIFAR-10, which obtains the top1 accuracy of 89.5.
 
 ```
 sh ./scripts/cifar10_caffe.sh
@@ -67,10 +72,11 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
 | ResNet-50  |      76.19     |     93.10      | 0.8172 |
 
 
-## Other frameworks
-* [torch (@facebookresearch)](https://github.com/facebookresearch/ResNeXt). (Original) Cifar and Imagenet
-* [MXNet (@dmlc)](https://github.com/dmlc/mxnet/tree/master/example/image-classification#imagenet-1k). Imagenet
-* [pytorch (@prlz77)](https://github.com/prlz77/ResNeXt.pytorch). Cifar
+## Other Projects
+* [Torch (@facebookresearch)](https://github.com/facebookresearch/ResNeXt). (Original) CIFAR and ImageNet
+* [MXNet (@dmlc)](https://github.com/dmlc/mxnet/tree/master/example/image-classification#imagenet-1k). ImageNet
+* [PyTorch (@prlz77)](https://github.com/prlz77/ResNeXt.pytorch). CIFAR
+* [EraseReLU](https://github.com/D-X-Y/EraseReLU). (will be public soon)
 
 ## Cite
 ```
@@ -96,6 +102,12 @@ From the original [ResNeXt](https://arxiv.org/pdf/1611.05431.pdf) and [ResNet](h
   title={Densely connected convolutional networks},
   author={Huang, Gao and Liu, Zhuang and Weinberger, Kilian Q and van der Maaten, Laurens},
   booktitle={Computer Vision and Pattern Recognition},
+  year={2017}
+}
+@article{dong2017eraserelu,
+  title={EraseReLU: A Simple Way to Ease the Training of Deep Convolution Neural Networks},
+  author={Dong, Xuanyi and Kang, Guoliang and Zhan, Kun and Yang, Yi},
+  journal={arXiv preprint arXiv:1709.07634},
   year={2017}
 }
 ```
