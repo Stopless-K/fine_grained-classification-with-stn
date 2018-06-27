@@ -8,6 +8,8 @@ import torchvision.datasets as dset
 import torchvision.transforms as transforms
 from utils import AverageMeter, RecorderMeter, time_string, convert_secs2time
 import models
+from my_folder import MyImageFolder
+
 
 model_names = sorted(name for name in models.__dict__
   if name.islower() and not name.startswith("__")
@@ -15,7 +17,7 @@ model_names = sorted(name for name in models.__dict__
 
 parser = argparse.ArgumentParser(description='Trains ResNeXt on CIFAR or ImageNet', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('data_path', type=str, help='Path to dataset')
-parser.add_argument('--dataset', type=str, choices=['cifar10', 'cifar100', 'imagenet', 'svhn', 'stl10'], help='Choose between Cifar10/100 and ImageNet.')
+parser.add_argument('--dataset', type=str, choices=['cifar10', 'cifar100', 'imagenet', 'svhn', 'stl10', 'cub_200'], help='Choose between Cifar10/100 and ImageNet.')
 parser.add_argument('--arch', metavar='ARCH', default='resnet18', choices=model_names, help='model architecture: ' + ' | '.join(model_names) + ' (default: resnext29_8_64)')
 # Optimization options
 parser.add_argument('--epochs', type=int, default=300, help='Number of epochs to train.')
@@ -70,6 +72,9 @@ def main():
   elif args.dataset == 'cifar100':
     mean = [x / 255 for x in [129.3, 124.1, 112.4]]
     std = [x / 255 for x in [68.2, 65.4, 70.4]]
+  elif args.dataset == 'cub_200':
+    mean = [0.4856077,  0.49941534, 0.43237692] 
+    std  = [0.23222743, 0.2277201,  0.26586822]
   else:
     assert False, "Unknow dataset : {}".format(args.dataset)
 
@@ -78,7 +83,20 @@ def main():
      transforms.Normalize(mean, std)])
   test_transform = transforms.Compose(
     [transforms.ToTensor(), transforms.Normalize(mean, std)])
-
+  if args.dataset == 'cub_200':
+      train_transform = transforms.Compose(
+              [transforms.RandomSizedCrop(224), transforms.RandomHorizontalFlip(), 
+                  transforms.ToTensor(), transforms.Normalize(mean, std)
+                  ]
+              )
+      test_transform = transforms.Compose(
+              [transforms.Scale(256), 
+                  transforms.CenterCrop(224),
+                  transforms.ToTensor(),
+                  transforms.Normalize(mean, std)
+                  ]
+              )
+    
   if args.dataset == 'cifar10':
     train_data = dset.CIFAR10(args.data_path, train=True, transform=train_transform, download=True)
     test_data = dset.CIFAR10(args.data_path, train=False, transform=test_transform, download=True)
@@ -95,6 +113,12 @@ def main():
     train_data = dset.STL10(args.data_path, split='train', transform=train_transform, download=True)
     test_data = dset.STL10(args.data_path, split='test', transform=test_transform, download=True)
     num_classes = 10
+
+  elif args.dataset == 'cub_200':
+    train_data = MyImageFolder(args.data_path+ 'train', transform= train_transform, data_cached= True)
+    test_data = MyImageFolder(args.data_path+ 'val', transform =test_transform, data_cached= True )
+    num_classes = 200
+
   elif args.dataset == 'imagenet':
     assert False, 'Do not finish imagenet code'
   else:
@@ -128,10 +152,20 @@ def main():
     if os.path.isfile(args.resume):
       print_log("=> loading checkpoint '{}'".format(args.resume), log)
       checkpoint = torch.load(args.resume)
-      recorder = checkpoint['recorder']
-      args.start_epoch = checkpoint['epoch']
-      net.load_state_dict(checkpoint['state_dict'])
-      optimizer.load_state_dict(checkpoint['optimizer'])
+#      recorder = checkpoint['recorder']
+#      args.start_epoch = checkpoint['epoch']
+
+      state_dict = checkpoint['state_dict']
+      model_dict = net.state_dict()
+      from_ = list(state_dict.keys())
+      to = list(model_dict.keys())
+      
+      for i, k in enumerate(from_):
+          if k not in ['module.fc.weight','module.fc.bias']: 
+            model_dict[to[i]] = state_dict[k]
+      
+      net.load_state_dict(model_dict)
+     # optimizer.load_state_dict(checkpoint['optimizer'])
       print_log("=> loaded checkpoint '{}' (epoch {})" .format(args.resume, checkpoint['epoch']), log)
     else:
       print_log("=> no checkpoint found at '{}'".format(args.resume), log)

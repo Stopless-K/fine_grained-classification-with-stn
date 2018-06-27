@@ -42,6 +42,73 @@ class ResNeXtBottleneck(nn.Module):
     
     return F.relu(residual + bottleneck, inplace=True)
 
+class CaltechBirdResNeXt(nn.Module):
+    """
+    ResNeXt50 for caltech birds classification
+    """
+    def __init__(self, block, layers, cardinality, base_width, num_classes):
+        super(CaltechBirdResNeXt, self).__init__()
+
+        self.cardinality = cardinality
+        self.base_width = base_width
+        self.num_classes = num_classes
+
+        self.inplanes = 64
+
+        self.conv1 = nn.Conv2d(3, 64, 7, 2, 3, bias=False)
+        self.bn1 = nn.BatchNorm2d(64)
+        self.relu1 = nn.ReLU(inplace=True)
+
+        self.maxpool1 = nn.MaxPool2d(kernel_size=3, stride=2, padding= 1)
+
+        self.stage_1 = self._make_layer(block, 64, layers[0])
+        self.stage_2 = self._make_layer(block, 128, layers[1], 2)
+        self.stage_3 = self._make_layer(block, 256, layers[2], 2)
+        self.stage_4 = self._make_layer(block, 512, layers[3], 2)
+        
+        self.avgpool = nn.AvgPool2d(7)
+        self.fc = nn.Linear(512* block.expansion, num_classes)
+        
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+            elif isinstance(m, nn.Linear):
+                init.kaiming_normal(m.weight)
+                m.bias.data.zero_()
+
+    def _make_layer(self, block, planes, blocks, stride= 1):
+        downsample = None
+        if stride != 1 or self.inplanes != planes * block.expansion:
+            downsample = nn.Sequential(
+                    nn.Conv2d(self.inplanes, planes* block.expansion, kernel_size=1, stride =stride, bias = False),
+
+                    nn.BatchNorm2d(planes* block.expansion)
+                    )
+        layers = []
+        layers.append(block(self.inplanes, planes, self.cardinality, self.base_width, stride, downsample))
+        self.inplanes = planes* block.expansion
+
+        for i in range(1, blocks):
+            layers.append(block(self.inplanes, planes, self.cardinality, self.base_width))
+
+        return nn.Sequential(*layers)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.maxpool1(x)
+        x = self.stage_1(x)
+        x = self.stage_2(x)
+        x = self.stage_3(x)
+        x = self.stage_4(x)
+        x = self.avgpool(x)
+        x = x.view(x.size(0), -1)
+
+        return self.fc(x)
 
 class CifarResNeXt(nn.Module):
   """
@@ -106,6 +173,13 @@ class CifarResNeXt(nn.Module):
     x = self.avgpool(x)
     x = x.view(x.size(0), -1)
     return self.classifier(x)
+
+def resnext50_32_4(num_classes=200):
+    """
+    resnext50 for caltech birds classification
+    """
+    model = CaltechBirdResNeXt(ResNeXtBottleneck, [3,4,6,3], 32, 4, num_classes)
+    return model
 
 def resnext29_16_64(num_classes=10):
   """Constructs a ResNeXt-29, 16*64d model for CIFAR-10 (by default)

@@ -13,7 +13,7 @@ You can construct a model with random weights by calling its constructor:
 .. ResNext: https://arxiv.org/abs/1611.05431
 """
 
-from .resnext import resnext29_8_64, resnext29_16_64
+from .resnext import resnext29_8_64, resnext29_16_64, resnext50_32_4
 from .resnet import resnet20, resnet32, resnet44, resnet56, resnet110
 from .preresnet import preresnet20, preresnet32, preresnet44, preresnet56, preresnet110
 from .caffe_cifar import caffe_cifar
