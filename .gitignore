@@ -97,3 +97,4 @@ data
 .*.swp
 *.sh
 main_main.py
+*.tar
