@@ -9,7 +9,7 @@ import torchvision.transforms as transforms
 from utils import AverageMeter, RecorderMeter, time_string, convert_secs2time
 import models
 from my_folder import MyImageFolder
-
+import numpy as np
 
 model_names = sorted(name for name in models.__dict__
   if name.islower() and not name.startswith("__")
@@ -134,17 +134,29 @@ def main():
   net = models.__dict__[args.arch](num_classes)
   print_log("=> network :\n {}".format(net), log)
 
-  net = torch.nn.DataParallel(net, device_ids=list(range(args.ngpu)))
 
   # define loss function (criterion) and optimizer
   criterion = torch.nn.CrossEntropyLoss()
-
-  optimizer = torch.optim.SGD(net.parameters(), state['learning_rate'], momentum=state['momentum'],
+  
+  if args.arch == 'spatial_transform_resnext50':
+    loc_params = net.loc.parameters()
+    loc_params_id = list(map(id, loc_params))
+    base_params = filter(lambda p: id(p) not in loc_params_id,
+                                   net.parameters())
+    optimizer = torch.optim.SGD([
+         {'params': base_params},
+         {'params': net.loc.parameters(), 'lr': 1e-4*state['learning_rate']},
+    #     {'params': net.stn.parameters()}
+        ] , state['learning_rate'], momentum=state['momentum'],
+     weight_decay=state['decay'], nesterov=True)
+    #optimizer = torch.optim.SGD(net.parameters(), state['learning_rate'], momentum=state['momentum'],
+    #            weight_decay=state['decay'], nesterov=True)
+ 
+  else:
+    optimizer = torch.optim.SGD(net.parameters(), state['learning_rate'], momentum=state['momentum'],
                 weight_decay=state['decay'], nesterov=True)
+ 
 
-  if args.use_cuda:
-    net.cuda()
-    criterion.cuda()
 
   recorder = RecorderMeter(args.epochs)
   # optionally resume from a checkpoint
@@ -154,23 +166,47 @@ def main():
       checkpoint = torch.load(args.resume)
 #      recorder = checkpoint['recorder']
 #      args.start_epoch = checkpoint['epoch']
-
-      state_dict = checkpoint['state_dict']
-      model_dict = net.state_dict()
-      from_ = list(state_dict.keys())
-      to = list(model_dict.keys())
       
-      for i, k in enumerate(from_):
+        
+      state_dict = checkpoint['state_dict']
+      if args.arch == 'spatial_transform_resnext50':
+          ckpt_weights = list(state_dict.values())[:-2]
+          m_list = net.crop_descriptors
+          loc = net.loc[0]
+          m_dict_keys = list(loc.state_dict().keys())
+          m_dict = dict(zip(m_dict_keys, ckpt_weights))
+          loc.load_state_dict(m_dict)
+          print('loaded loc net')
+          for m in m_list:
+              m = m[0]
+              m_dict_keys = list(m.state_dict().keys())
+              m_dict = dict(zip(m_dict_keys, ckpt_weights))
+              m.load_state_dict(m_dict)
+              print('loaded one descriptor')
+      else:
+          
+
+        model_dict = net.state_dict()
+        from_ = list(state_dict.keys())
+        to = list(model_dict.keys())
+      
+        for i, k in enumerate(from_):
           if k not in ['module.fc.weight','module.fc.bias']: 
             model_dict[to[i]] = state_dict[k]
       
-      net.load_state_dict(model_dict)
+        net.load_state_dict(model_dict)
      # optimizer.load_state_dict(checkpoint['optimizer'])
       print_log("=> loaded checkpoint '{}' (epoch {})" .format(args.resume, checkpoint['epoch']), log)
     else:
       print_log("=> no checkpoint found at '{}'".format(args.resume), log)
   else:
     print_log("=> do not use any checkpoint for {} model".format(args.arch), log)
+  loc_classifier_w = net.loc[1].fc_2.weight
+  classifier_w = net.classifier.weight 
+  net = torch.nn.DataParallel(net, device_ids=list(range(args.ngpu)))
+  if args.use_cuda:
+    net.cuda()
+    criterion.cuda()
 
   if args.evaluate:
     validate(test_loader, net, criterion, log)
@@ -180,8 +216,8 @@ def main():
   start_time = time.time()
   epoch_time = AverageMeter()
   for epoch in range(args.start_epoch, args.epochs):
-    current_learning_rate = adjust_learning_rate(optimizer, epoch, args.gammas, args.schedule)
-
+   # current_learning_rate = adjust_learning_rate(optimizer, epoch, args.gammas, args.schedule)
+    current_learning_rate = 0
     need_hour, need_mins, need_secs = convert_secs2time(epoch_time.avg * (args.epochs-epoch))
     need_time = '[Need: {:02d}:{:02d}:{:02d}]'.format(need_hour, need_mins, need_secs)
 
@@ -189,7 +225,11 @@ def main():
                 + ' [Best : Accuracy={:.2f}, Error={:.2f}]'.format(recorder.max_accuracy(False), 100-recorder.max_accuracy(False)), log)
 
     # train for one epoch
-    train_acc, train_los = train(train_loader, net, criterion, optimizer, epoch, log)
+    train_acc, train_los = train(train_loader, net, criterion, optimizer, epoch, log,
+            loc_classifier_w
+            , classifier_w
+
+            )
 
     # evaluate on validation set
     #val_acc,   val_los   = extract_features(test_loader, net, criterion, log)
@@ -212,7 +252,7 @@ def main():
   log.close()
 
 # train function (forward, backward, update)
-def train(train_loader, model, criterion, optimizer, epoch, log):
+def train(train_loader, model, criterion, optimizer, epoch, log, w, c_w):
   batch_time = AverageMeter()
   data_time = AverageMeter()
   losses = AverageMeter()
@@ -237,12 +277,15 @@ def train(train_loader, model, criterion, optimizer, epoch, log):
     loss = criterion(output, target_var)
 
     # measure accuracy and record loss
+    #print(np.argmax(output.cpu().data.numpy(), -1))
     prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
     losses.update(loss.data[0], input.size(0))
     top1.update(prec1[0], input.size(0))
     top5.update(prec5[0], input.size(0))
 
     # compute gradient and do SGD step
+    #print(w.cpu().data)
+    #print(c_w.cpu().data)
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
@@ -346,7 +389,11 @@ def adjust_learning_rate(optimizer, epoch, gammas, schedule):
     else:
       break
   for param_group in optimizer.param_groups:
-    param_group['lr'] = lr
+   # print(param_group['name'])
+    print(param_group['lr'])
+    if param_group['name'] == 'loc':
+        param_group['lr'] = lr* 1e-4
+    else: param_group['lr'] = lr
   return lr
 
 def accuracy(output, target, topk=(1,)):

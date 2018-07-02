@@ -4,7 +4,9 @@ from torch.nn import init
 import math
 from .spatial_transformer_network import Localise
 from .spatial_transformer_network import STN
-import torch       
+import torch      
+import numpy as np
+from neupeak.utils import webcv2 as cv2
 class ResNeXtBottleneck(nn.Module):
   expansion = 4
   """
@@ -125,7 +127,7 @@ class SpatialTransformResNeXt(nn.Module):
                         nn.AvgPool2d(7)
                         )
                     )
-        self.classifier = nn.Linear(512* block.expansion, num_classes)
+        self.classifier = nn.Linear(self.N*512* block.expansion, num_classes)
         init.kaiming_normal(self.classifier.weight)
         self.classifier.bias.data.zero_()
         
@@ -138,6 +140,11 @@ class SpatialTransformResNeXt(nn.Module):
         features = []
         for i in range(self.N):
             transformed = self.stn(x, thetas[i])
+           # o = np.transpose((x.cpu().data.numpy()* 255)[0], (1,2,0))
+           # img = np.transpose((transformed.cpu().data.numpy()* 255)[0], (1,2,0))
+           # cv2.imshow('original', o)
+           # cv2.imshow('transformed', img)
+           # cv2.waitKey(0)
             feature = self.crop_descriptors[i](transformed)
             features.append(feature.view(feature.size(0),-1 ))
         x = torch.cat(features, 1)

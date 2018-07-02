@@ -43,14 +43,13 @@ class Localise(nn.Module):
   
   def g_theta(self, theta):
       minibatch_size = theta.size()[0]
-      eye = torch.eye(2)* 0.5
+      eye = torch.eye(2)* 0.7
       eye = eye.unsqueeze(0).repeat(minibatch_size, 1,1)
       theta = theta.view(-1, self.N, 2)
       thetas = []
       for i in range(self.N):
           translation_coeff = theta[:, i, :].unsqueeze(-1)
           thetas.append(torch.cat([eye.cuda(), translation_coeff], -1))
-      
       return thetas
 
   def forward(self,x):
@@ -61,7 +60,7 @@ class Localise(nn.Module):
       x = self.fc_1(x)
       x = F.relu(self.bn_fc_1(x), inplace=True)
       
-      out = self.fc_2(x)
+      out = F.tanh(self.fc_2(x))* 0.3
 
       return self.g_theta(out)
 
